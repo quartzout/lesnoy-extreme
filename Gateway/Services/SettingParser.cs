@@ -10,7 +10,7 @@ public partial class SettingParser : ISettingParser
         var regex = FilenameSettingsRegex();
         var match = regex.Match(filename);
         if (!match.Success)
-            throw new ArgumentException($"Invalid filename: {filename}");
+            return new Dictionary<string, string>();
             
         var firstGroup = match.Groups.Values.ElementAtOrDefault(1)?.Value;
         var secondGroup = match.Groups.Values.ElementAtOrDefault(2)?.Value;
@@ -19,7 +19,7 @@ public partial class SettingParser : ISettingParser
             
         if (!float.TryParse(firstGroup, out var firstFloat)
             || !float.TryParse(secondGroup, out var secondFloat))
-            throw new ArgumentException($"Invalid filename: {filename}");
+            return new Dictionary<string, string>();
             
         return new Dictionary<string, string>
         {

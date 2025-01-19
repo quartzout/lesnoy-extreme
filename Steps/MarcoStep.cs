@@ -20,7 +20,7 @@ public class MarcoStep(
 
         try
         {
-            if (!CheckAdmin()) return;
+            if (_stepsOptions.DoOsSpecificChecks && !CheckAdmin()) return;
 
             SetupWindow();
             await StartTest();
