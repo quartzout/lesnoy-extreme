@@ -6,7 +6,7 @@ public static class WindowManagerServiceCollectionExtensions
 {
     public static IServiceCollection AddWindowManager(this IServiceCollection services)
     {
-        services.AddScoped<IWindowManager, WindowManager.Services.WindowManager>();
+        services.AddSingleton<IWindowManager, WindowManager.Services.WindowManager>();
         return services;
     }
 }

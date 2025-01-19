@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "LESNOY_EXTREME": {
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      },
+      "commandName": "Project"
+    }
+  }
+}

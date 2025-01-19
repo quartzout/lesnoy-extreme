@@ -13,7 +13,7 @@ public class MarcoStep(
     
     private readonly StepsOptions _stepsOptions = optionsAccessor.Value;
     
-    public async Task Run()
+    public async Task Run(CancellationToken token)
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
         Console.WriteLine("привет!!!");

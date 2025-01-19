@@ -1,18 +1,23 @@
+using Gateway;
 using Gateway.Extensions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Steps;
+using Steps.Options;
 using WindowManager;
 
-var services = new ServiceCollection();
+var builder = Host.CreateApplicationBuilder(args);
 
-services.AddSteps();
-services.AddWindowManager();
-services.AddGateway();
+builder.Services.AddSteps();
+builder.Services.AddWindowManager();
+builder.Services.AddGateway();
 
-services.AddSolutionOptions();
+builder.AddProcessNameConfigurationSource();
 
-var serviceProvider = services.BuildServiceProvider();
+builder.Services.Configure<StepsOptions>(builder.Configuration.GetSection(StepsOptions.SectionName));
 
-var scope = serviceProvider.CreateScope();
-var entryPoint = scope.ServiceProvider.GetRequiredService<MarcoStep>();
-await entryPoint.Run();
+builder.Services.AddHostedService<EntrypointHostedService>();
+
+var host = builder.Build();
+await host.RunAsync();

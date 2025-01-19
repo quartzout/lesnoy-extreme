@@ -6,7 +6,7 @@ public static class StepsServiceCollectionExtensions
 {
     public static IServiceCollection AddSteps(this IServiceCollection services)
     {
-        services.AddScoped<MarcoStep>();
+        services.AddSingleton<MarcoStep>();
         return services;
     }
 }

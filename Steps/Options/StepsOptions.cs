@@ -8,10 +8,10 @@ public record StepsOptions
     public required TimeSpan ShutdownDelay { get; init; }
     public required TimeSpan TimerInterval { get; init; } 
     public required string WindowName { get; init; } 
-    public required (int X, int Y) WindowSize { get; init; } 
-    public required (int X, int Y) ConsoleWindowSize { get; init; }
+    public required Vector WindowSize { get; init; } 
+    public required Vector ConsoleWindowSize { get; init; }
     public required int ClickCount { get; init; }
-    public required (int X, int Y) FinishClickOffset { get; init; }
-    public required (int X, int Y) StartClickOffset { get; init; }
+    public required Vector FinishClickOffset { get; init; }
+    public required Vector StartClickOffset { get; init; }
 
 }
