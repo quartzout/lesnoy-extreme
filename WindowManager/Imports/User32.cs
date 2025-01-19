@@ -1,11 +1,8 @@
-﻿using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
-namespace LESNOY_EXTREME;
+namespace WindowManager.Imports;
 
-file static class User32
+public static class User32
 {
     [DllImport("user32.dll", SetLastError = true)]
     public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
@@ -37,17 +34,8 @@ file static class User32
 
     [DllImport("USER32.DLL")]
     public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
-    
-    [DllImport("user32.dll")]
-    public static extern uint GetWindowThreadProcessId(IntPtr hWnd, IntPtr ProcessId);
-    
-    [DllImport("kernel32.dll")]
-    public static extern uint GetCurrentThreadId();
-    
-    [DllImport("user32.dll")]
-    public static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
-    
-           /// <summary>
+
+    /// <summary>
         ///     Changes the size, position, and Z order of a child, pop-up, or top-level window. These windows are ordered
         ///     according to their appearance on the screen. The topmost window receives the highest rank and is the first window
         ///     in the Z order.
@@ -234,213 +222,23 @@ file static class User32
         /// </remarks>
     [DllImport("user32.dll", SetLastError=true)]
     public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, UInt32 uFlags);
-           
-    [DllImport("user32.dll")]
-    public static extern IntPtr GetActiveWindow();
-    
+
     [DllImport("user32.dll",CharSet=CharSet.Auto, CallingConvention=CallingConvention.StdCall)]
     public static extern void mouse_event(uint dwFlags, uint dx, uint dy, uint cButtons, uint dwExtraInfo);
-    //Mouse actions
-
-    [DllImport("user32.dll", EntryPoint = "SetCursorPos")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool SetCursorPos(int x, int y);   
     
-    [DllImport("kernel32.dll", SetLastError=true)]
-    public static extern bool GetConsoleMode(
-        IntPtr hConsoleHandle,
-        out int lpMode);
-
-    [DllImport("kernel32.dll", SetLastError=true)]
-    public static extern bool SetConsoleMode(
-        IntPtr hConsoleHandle,
-        int ioMode);
-    
-    [DllImport("kernel32.dll", SetLastError=true)]
-    public static extern IntPtr GetConsoleWindow();
-    
-    [DllImport("Kernel32.dll", SetLastError = true)]
-    public static extern IntPtr GetStdHandle(int nStdHandle);
-    
-    
-    /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public struct POINT
+    public struct Point
     {
         public int X;
         public int Y;
 
-        public static implicit operator Point(POINT point)
+        public static implicit operator System.Drawing.Point(Point point)
         {
-            return new Point(point.X, point.Y);
+            return new System.Drawing.Point(point.X, point.Y);
         }
     }
     
     [DllImport("user32.dll")]
-    public static extern bool GetCursorPos(out POINT lpPoint);
+    public static extern bool GetCursorPos(out Point lpPoint);
     
-}
-
-public static class Window
-{
-    private const int SwMaximize = 3;
-    private const int SwMinimize = 6;
-
-    
-    public static bool Maximize(IntPtr hWnd)
-    {
-        return User32.ShowWindow(hWnd, SwMaximize);
-    }
-    
-    public static bool Minimize(IntPtr hWnd)
-    {
-        return User32.ShowWindow(hWnd, SwMinimize);
-    }
-    
-    public static bool Restore(IntPtr hWnd)
-    {
-        return User32.ShowWindow(hWnd, 9);
-    }
-    
-    public static IntPtr Find(string caption)
-    {
-        return User32.FindWindow(null, caption);
-    }
-
-    public static bool Focus(IntPtr hWnd)
-    {
-        return User32.SetForegroundWindow(hWnd);
-    }
-    
-    public static uint MF_BYPOSITION = 0x400;
-    public static uint MF_REMOVE = 0x1000;
-
-    //assorted constants needed
-    public static int GWL_STYLE = -16;
-    public static int WS_CHILD = 0x40000000; //child window
-    public static int WS_BORDER = 0x00800000; //window with border
-    public static int WS_DLGFRAME = 0x00400000; //window with double border but no title
-    public static int WS_CAPTION = WS_BORDER | WS_DLGFRAME; //window with a title bar
-    
-    public static void RemoveBorders(IntPtr window) {
-        IntPtr pFoundWindow = window;
-        int style = User32.GetWindowLong(pFoundWindow, GWL_STYLE);
-        User32.SetWindowLong(pFoundWindow, GWL_STYLE, (style & ~WS_CAPTION));
-    }
-
-    public static bool BringWindowToTop(IntPtr hWnd)
-    {
-        return User32.BringWindowToTop(hWnd);
-    }
-
-    private static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
-    
-    public static class SWP
-    {
-        public static readonly uint
-            NOSIZE = 0x0001,
-            NOMOVE = 0x0002,
-            NOZORDER = 0x0004,
-            NOREDRAW = 0x0008,
-            NOACTIVATE = 0x0010,
-            DRAWFRAME = 0x0020,
-            FRAMECHANGED = 0x0020,
-            SHOWWINDOW = 0x0040,
-            HIDEWINDOW = 0x0080,
-            NOCOPYBITS = 0x0100,
-            NOOWNERZORDER = 0x0200,
-            NOREPOSITION = 0x0200,
-            NOSENDCHANGING = 0x0400,
-            DEFERERASE = 0x2000,
-            ASYNCWINDOWPOS = 0x4000;
-    }
-    
-    public static (bool, bool) AttachThreads(IntPtr hWnd)
-    {
-        uint appThread = User32.GetCurrentThreadId();
-        uint foregroundThread = User32.GetWindowThreadProcessId(hWnd, IntPtr.Zero);
-
-        if (foregroundThread != appThread)
-        {
-            var a = User32.AttachThreadInput(foregroundThread, appThread, true);
-            var b =  User32.AttachThreadInput(appThread, foregroundThread , true);
-            return (a, b);
-        }
-
-        throw new NotImplementedException();
-    }
-
-    public static bool MakeTopmost(IntPtr hWnd)
-    {
-        return User32.SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP.NOSIZE | SWP.NOMOVE);
-    }
-
-    public static IntPtr GetCurrentWindow()
-    {
-        var process = Process.GetCurrentProcess();
-        return process.MainWindowHandle;
-    }
-    
-    private const int MOUSEEVENTF_LEFTDOWN = 0x02;
-    private const int MOUSEEVENTF_LEFTUP = 0x04;
-    private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
-    private const int MOUSEEVENTF_RIGHTUP = 0x10;
-
-    public static void Click(int x, int y)
-    {
-        User32.SetCursorPos(x, y);
-        User32.mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
-    }
-
-    public static (int X, int Y) GetCursorPos()
-    {
-        User32.GetCursorPos(out var point);
-        return (point.X, point.Y);
-    }
-
-    public static bool SetWindowPos(IntPtr hWnd, int x, int y, int cx, int cy)
-    {
-        return User32.SetWindowPos(hWnd, HWND_TOPMOST, x, y, cx, cy, SWP.NOOWNERZORDER);
-    }
-
-    /// <summary>
-    /// This flag enables the user to use the mouse to select and edit text. To enable
-    /// this option, you must also set the ExtendedFlags flag.
-    /// </summary>
-    const int QuickEditMode = 64;
-    
-    public const int STD_INPUT_HANDLE = -10;
-
-
-// ExtendedFlags must be combined with
-// InsertMode and QuickEditMode when setting
-    /// <summary>
-    /// ExtendedFlags must be enabled in order to enable InsertMode or QuickEditMode.
-    /// </summary>
-    const int ExtendedFlags = 128;
-    
-    public static bool DisableQuickEdit()
-    {
-        IntPtr conHandle = User32.GetStdHandle(STD_INPUT_HANDLE);
-        Console.WriteLine(conHandle);
-        int mode;
-
-        if (!User32.GetConsoleMode(conHandle, out mode))
-        {
-            var error = Marshal.GetLastWin32Error();
-            var errorMessage = new Win32Exception(error).Message;
-            Console.WriteLine(errorMessage);
-            return false;
-        }
-
-        mode &= ~(QuickEditMode | ExtendedFlags);
-
-        if (!User32.SetConsoleMode(conHandle, mode))
-        {
-            Console.WriteLine("12");
-            return false;
-        }
-
-        return true;
-    }
 }
