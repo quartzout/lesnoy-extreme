@@ -6,9 +6,9 @@ namespace Core;
 
 public class ChannelRunEventConsumer(ChannelReader<RunEvent> channelReader) : IRunEventConsumer
 {
-    public IAsyncEnumerable<RunEvent> ConsumeAsync()
+    public IAsyncEnumerable<RunEvent> ConsumeAsync(CancellationToken cancellation)
     {
-        return channelReader.ReadAllAsync();
+        return channelReader.ReadAllAsync(cancellation);
     }
 
     public bool HasCompleted()

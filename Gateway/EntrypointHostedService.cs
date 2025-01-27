@@ -1,12 +1,13 @@
 using Core;
+using Core.Abstractions;
 using Microsoft.Extensions.Hosting;
 
 namespace Gateway;
 
-public class EntrypointHostedService(Runner macroStep) : BackgroundService
+public class EntrypointHostedService(IRunner runner) : ParallelBackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await macroStep.RunToCompletion(stoppingToken);
+        await runner.RunToCompletion(stoppingToken);
     }
 }

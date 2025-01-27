@@ -1,15 +1,21 @@
+using Core.Abstractions.Events.Stages;
 using Core.Options;
-using Infrastructure.Abstractions;
 using Microsoft.Extensions.Options;
+using WindowsApi.Abstractions;
 
 namespace Core;
 
-public class SetupStep(IWindowManager windowManager, IOptions<StepsOptions> options) : ISetupStep
+public class SetupStep(
+    IWindowManager windowManager, 
+    IRunEventPublisher publisher,
+    IOptions<StepsOptions> options) : ISetupStep
 {
     private readonly StepsOptions _options = options.Value;
 
-    public Task RunToCompletion()
+    public async Task RunToCompletion()
     {
+        await publisher.PublishEvent(new SetupEvent.Started());
+        
         var setupResult = false;
         var firstAttempt = true;
         do
@@ -93,7 +99,5 @@ public class SetupStep(IWindowManager windowManager, IOptions<StepsOptions> opti
             setupResult = true;
 
         } while (!setupResult);
-        
-        return Task.CompletedTask;
     }
 }

@@ -2,12 +2,12 @@ using System.Diagnostics;
 using Core.Abstractions;
 using Core.Abstractions.Models;
 using Core.Options;
-using Infrastructure.Abstractions;
 using Microsoft.Extensions.Options;
+using WindowsApi.Abstractions;
 
 namespace Core;
 
-public class Runner(
+internal class Runner(
     IWindowManager windowManager,
     IWinRightsService winRightsService,
     ISetupStep setupStep,

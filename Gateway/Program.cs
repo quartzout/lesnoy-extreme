@@ -1,11 +1,8 @@
-using Core;
 using Core.Options;
 using Core.ServiceCollectionExtensions;
 using WindowsApi.ServiceCollectionExtensions;
 using Gateway.ServiceCollectionExtensions;
 using Gateway;
-using Gateway.Extensions;
-using Infrastructure.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -20,6 +17,7 @@ builder.AddProcessNameConfigurationSource();
 builder.Services.Configure<StepsOptions>(builder.Configuration.GetSection(StepsOptions.SectionName));
 
 builder.Services.AddHostedService<EntrypointHostedService>();
+builder.Services.AddHostedService<UiHostedService>();
 
 var host = builder.Build();
 await host.RunAsync();
