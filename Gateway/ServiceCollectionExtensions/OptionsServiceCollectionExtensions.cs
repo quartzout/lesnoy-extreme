@@ -3,12 +3,14 @@ using Gateway.InternalInterfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Gateway.Extensions;
+namespace Gateway.ServiceCollectionExtensions;
 
 public static class OptionsServiceCollectionExtensions
 {
     public static IHostApplicationBuilder AddProcessNameConfigurationSource(this IHostApplicationBuilder builder)
     {
+        builder.Services.AddTransient<ISettingParser, Services.SettingParser>();
+
         var provider = builder.Services.BuildServiceProvider();
         var settingsParser = provider.GetRequiredService<ISettingParser>();
 

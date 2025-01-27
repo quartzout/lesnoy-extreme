@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Infrastructure.Windows.Imports;
+namespace WindowsApi.Imports;
 
 public static class User32
 {

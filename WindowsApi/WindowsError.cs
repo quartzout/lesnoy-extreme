@@ -1,4 +1,4 @@
-namespace Infrastructure.Windows;
+namespace WindowsApi;
 
 public enum WindowsError
 {

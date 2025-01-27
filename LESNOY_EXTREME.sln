@@ -2,11 +2,11 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gateway", "Gateway\Gateway.csproj", "{51502D1A-95C2-4F2C-B4FD-77F1F25798BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Windows", "Infrastructure.Windows\Infrastructure.Windows.csproj", "{A83B7228-81BE-4A97-9ECF-BD52E7A3BE27}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsApi", "WindowsApi\WindowsApi.csproj", "{A83B7228-81BE-4A97-9ECF-BD52E7A3BE27}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{96A27B26-50E6-4177-A380-7FC823C436B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Abstractions", "Infrastructure.Abstractions\Infrastructure.Abstractions.csproj", "{53FC3817-2F12-429B-91BE-FEA26994DDBE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsApi.Abstractions", "WindowsApi.Abstractions\WindowsApi.Abstractions.csproj", "{53FC3817-2F12-429B-91BE-FEA26994DDBE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Abstractions", "Core.Abstractions\Core.Abstractions.csproj", "{B415AD8E-DEDE-49A4-AA3F-E536D50D5FCA}"
 EndProject

@@ -1,10 +1,10 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Infrastructure.Abstractions;
-using Infrastructure.Windows.Imports;
+using WindowsApi.Abstractions;
+using WindowsApi.Imports;
 
-namespace Infrastructure.Windows.Services;
+namespace WindowsApi.Services;
 
 internal class WindowManager : IWindowManager
 {

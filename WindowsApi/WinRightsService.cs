@@ -1,12 +1,12 @@
 using System.Security.Principal;
-using Infrastructure.Abstractions;
 using Microsoft.Extensions.Logging;
+using WindowsApi.Abstractions;
 
-namespace Core;
+namespace WindowsApi;
 
 public class WinRightsService(ILogger<WinRightsService> logger) : IWinRightsService
 {
-    public bool CheckAdmin()
+    public bool IsProcessAdmin()
     {
         try
         {

@@ -1,5 +1,8 @@
 using Core;
 using Core.Options;
+using Core.ServiceCollectionExtensions;
+using WindowsApi.ServiceCollectionExtensions;
+using Gateway.ServiceCollectionExtensions;
 using Gateway;
 using Gateway.Extensions;
 using Infrastructure.Windows;
@@ -9,7 +12,7 @@ using Microsoft.Extensions.Hosting;
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.Services.AddCore();
-builder.Services.AddInfrastructureWindows();
+builder.Services.AddWindowsApi();
 builder.Services.AddGateway();
 
 builder.AddProcessNameConfigurationSource();

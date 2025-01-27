@@ -1,4 +1,4 @@
-namespace Infrastructure.Abstractions;
+namespace WindowsApi.Abstractions;
 
 public interface IWindowManager
 {

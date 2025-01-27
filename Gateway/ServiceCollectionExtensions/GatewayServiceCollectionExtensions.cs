@@ -1,13 +1,13 @@
-using Gateway.InternalInterfaces;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Gateway.Extensions;
+namespace Gateway.ServiceCollectionExtensions;
 
 public static class GatewayServiceCollectionExtensions
 {
     public static IServiceCollection AddGateway(this IServiceCollection services)
     {
-        services.AddTransient<ISettingParser, Services.SettingParser>();
+        services.AddUi();
+        
         return services;
     }
 }
