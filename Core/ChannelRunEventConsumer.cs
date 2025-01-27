@@ -4,9 +4,9 @@ using Core.Abstractions.Events;
 
 namespace Core;
 
-public class ChannelRunEventConsumer(ChannelReader<IRunEvent> channelReader) : IRunEventConsumer
+public class ChannelRunEventConsumer(ChannelReader<RunEvent> channelReader) : IRunEventConsumer
 {
-    public IAsyncEnumerable<IRunEvent> ConsumeAsync()
+    public IAsyncEnumerable<RunEvent> ConsumeAsync()
     {
         return channelReader.ReadAllAsync();
     }

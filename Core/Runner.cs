@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Security.Principal;
 using Core.Abstractions;
 using Core.Abstractions.Models;
 using Core.Options;
@@ -10,51 +9,22 @@ namespace Core;
 
 public class Runner(
     IWindowManager windowManager,
+    IWinRightsService winRightsService,
+    ISetupStep setupStep,
     IOptions<StepsOptions> optionsAccessor) : IRunner
 {
-    
     private readonly StepsOptions _stepsOptions = optionsAccessor.Value;
     
     public async Task<RunnerResult> RunToCompletion(CancellationToken token)
     {
-        Console.OutputEncoding = System.Text.Encoding.UTF8;
-        Console.WriteLine("привет!!!");
+        if (_stepsOptions.DoAdminCheck && !winRightsService.IsProcessAdmin()) 
+            return RunnerResult.Error.AdminRightsRequired;
 
-        try
-        {
-            if (_stepsOptions.DoAdminCheck && !CheckAdmin()) return RunnerResult.Error.AdminRightsRequired;
-
-            SetupWindow();
-            await StartTest();
-            await RunTimer();
-            await StopTest();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            Console.WriteLine("\n\nвы ошибка, нажмите чтобы выйти");
-            Console.ReadLine();
-        }
-        
+        await setupStep.RunToCompletion();
+        await StartTest();
+        await RunTimer();
+        await StopTest();
         return new RunnerResult.Success();
-    }
-    
-    bool CheckAdmin()
-    
-    {
-        var identity = WindowsIdentity.GetCurrent();
-        var principal = new WindowsPrincipal(identity);
-        var isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
-
-        if (!isAdmin)
-        {
-            Console.WriteLine("\n!!ошибка! пожалуймта перезапустите скрипт от имени администратора!");
-            Console.WriteLine("\nнажмите Enter чтобы закрыть");
-            Console.ReadLine();
-            return false;
-        }
-
-        return true;
     }
 
     async Task RunShutdownTimer()
@@ -82,94 +52,6 @@ public class Runner(
             Process.Start("shutdown","/s /t 0");
             while (true) ;
         }
-    }
-
-    void SetupWindow()
-    {
-        var setupResult = false;
-        var firstAttempt = true;
-        do
-        {
-            if (!firstAttempt)
-            {
-                Console.WriteLine("перезапустите аиду и\\или скрипт");
-                Console.WriteLine("нажмите Enter чтобы повторить попытку");
-                Console.ReadLine();
-                Console.Clear();
-            }
-
-            firstAttempt = false;
-            setupResult = false;
-            
-            Console.WriteLine($"пытаюсь найти окно \"{_stepsOptions.WindowName}\" ");
-            var window = windowManager.Find(_stepsOptions.WindowName);
-            if (window == IntPtr.Zero)
-            {
-                Console.WriteLine("не могу найти нужное окно!!!");
-                continue;
-            }
-            
-            Console.WriteLine("аида найдена спасибо!");
-            
-            windowManager.RemoveBorders(window);
-            
-            var minimizeResult = windowManager.Minimize(window);
-            if (!minimizeResult)
-            {
-                Console.WriteLine("не могу скрыть аиду окно по неизвестной ошибке!");
-                continue;
-            }
-            
-            var maximizeResult = windowManager.Maximize(window);
-            if (!maximizeResult)
-            {
-                Console.WriteLine("не могу раскрыть аиду окно на полный по неизвестной ошибке!");
-                continue;
-            }
-
-            var sizeResult = windowManager.SetWindowPos(window, 0, 0, _stepsOptions.WindowSize.X, _stepsOptions.WindowSize.Y);
-            if (!sizeResult)
-            {
-                Console.WriteLine("не могу установить размер аиды окна по неизвестной ошибке!");
-                continue;
-            }
-
-            var topmostResult = windowManager.MakeTopmost(window);
-            if (!topmostResult)
-            {
-                Console.WriteLine("не могу сделать аиду окно на поверх остальных окон по неизвестной ошибке!");
-                continue;
-            }
-            
-            var current = windowManager.GetCurrentWindow();
-            if (current == IntPtr.Zero)
-            {
-                Console.WriteLine("не могу найти окно консоли скрипта!!!");
-                continue;
-            }
-            
-            var currentTopmostResult = windowManager.MakeTopmost(current);
-            if (!currentTopmostResult)
-            {
-                Console.WriteLine("не могу сделать скрипта окно на поверх остальных окон по неизвестной ошибке!");
-                continue;
-            }
-            
-            var quickResult = windowManager.DisableQuickEdit();
-            if (!quickResult)
-            {
-                Console.WriteLine("не могу выключить редактирование в окно скрипта по неизвестной ошибке!");
-                continue;
-            }
-            
-            var focusResult = windowManager.Focus(current);
-            var topResult = windowManager.BringWindowToTop(current);
-            var placeResult = windowManager.SetWindowPos(current, _stepsOptions.WindowSize.X, 0, _stepsOptions.ConsoleWindowSize.X,
-                _stepsOptions.ConsoleWindowSize.Y);
-
-            setupResult = true;
-
-        } while (!setupResult);
     }
 
     async Task RunTimer()

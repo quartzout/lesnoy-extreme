@@ -2,9 +2,9 @@ using OneOf;
 
 namespace Core.Abstractions.Events.Stages;
 
-public interface IStopAppEvent : IRunEvent
+public static class StopAppEvent
 {
-    public record Started : IStopAppEvent;
+    public record Started;
 
-    public record ClickMade : IStopAppEvent;
+    public record ClickMade;
 }

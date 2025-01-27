@@ -1,8 +1,6 @@
-using OneOf;
-
 namespace Core.Abstractions.Events.Stages;
 
-public interface IFinishedEvent : IRunEvent
+public static class FinishedEvent
 {
-    public record Started : IFinishedEvent;
+    public record Started;
 }

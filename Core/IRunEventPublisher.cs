@@ -4,5 +4,5 @@ namespace Core;
 
 public interface IRunEventPublisher
 {
-    public Task PublishEvent(IRunEvent runEvent);
+    public Task PublishEvent(RunEvent runEvent);
 }

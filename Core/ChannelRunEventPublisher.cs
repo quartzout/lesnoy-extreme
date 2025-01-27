@@ -3,9 +3,9 @@ using Core.Abstractions.Events;
 
 namespace Core;
 
-public class ChannelRunEventPublisher(ChannelWriter<IRunEvent> writer) : IRunEventPublisher
+public class ChannelRunEventPublisher(ChannelWriter<RunEvent> writer) : IRunEventPublisher
 {
-    public async Task PublishEvent(IRunEvent runEvent)
+    public async Task PublishEvent(RunEvent runEvent)
     {
         await writer.WriteAsync(runEvent);
     }

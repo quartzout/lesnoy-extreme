@@ -1,8 +1,8 @@
 namespace Core.Abstractions.Events.Stages;
 
-public interface IStartAppEvent : IRunEvent
+public static class StartAppEvent
 {
-    public record Started : IStartAppEvent;
+    public record Started;
 
-    public record ClickMade : IStartAppEvent;
+    public record ClickMade;
 }

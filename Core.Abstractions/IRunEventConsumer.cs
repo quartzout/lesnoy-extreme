@@ -4,7 +4,7 @@ namespace Core.Abstractions;
 
 public interface IRunEventConsumer
 {
-    public IAsyncEnumerable<IRunEvent> ConsumeAsync();
+    public IAsyncEnumerable<RunEvent> ConsumeAsync();
 
     public bool HasCompleted();
 }

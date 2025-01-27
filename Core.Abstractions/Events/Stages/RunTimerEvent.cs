@@ -1,8 +1,8 @@
 namespace Core.Abstractions.Events.Stages;
 
-public interface IRunTimerEvent : IRunEvent
+public static class RunTimerEvent
 {
-    public record Started(TimeSpan Total) : IRunTimerEvent;
+    public record Started(TimeSpan Total);
 
-    public record TimerUpdated(TimeSpan NewValue) : IRunTimerEvent;
+    public record TimerUpdated(TimeSpan NewValue);
 }

@@ -2,9 +2,9 @@ using Core.Abstractions.Models;
 
 namespace Core.Abstractions.Events.Stages;
 
-public interface IRunShutdownTimerEvent : IRunEvent
+public static class RunShutdownTimerEvent
 {
-    public record Started(TimeSpan Total, ShutdownError Reason) : IRunShutdownTimerEvent;
+    public record Started(TimeSpan Total, ShutdownError Reason);
 
-    public record TimerUpdated(TimeSpan NewValue) : IRunShutdownTimerEvent;
+    public record TimerUpdated(TimeSpan NewValue);
 }

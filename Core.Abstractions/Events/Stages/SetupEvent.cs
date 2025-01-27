@@ -1,6 +1,6 @@
 namespace Core.Abstractions.Events.Stages;
 
-public interface ISetupEvent : IRunEvent
+public static class SetupEvent
 {
-    public class Started : ISetupEvent;
+    public class Started;
 }

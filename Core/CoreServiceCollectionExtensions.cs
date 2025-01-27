@@ -11,9 +11,9 @@ public static class CoreServiceCollectionExtensions
     {
         services.AddSingleton<Runner>();
 
-        services.AddSingleton(Channel.CreateUnbounded<IRunEvent>());
-        services.AddSingleton(sp => sp.GetRequiredService<Channel<IRunEvent>>().Reader);
-        services.AddSingleton(sp => sp.GetRequiredService<Channel<IRunEvent>>().Writer);
+        services.AddSingleton(Channel.CreateUnbounded<RunEvent>());
+        services.AddSingleton(sp => sp.GetRequiredService<Channel<RunEvent>>().Reader);
+        services.AddSingleton(sp => sp.GetRequiredService<Channel<RunEvent>>().Writer);
 
         services.AddTransient<IRunEventPublisher, ChannelRunEventPublisher>();
         services.AddTransient<IRunEventConsumer, ChannelRunEventConsumer>();
