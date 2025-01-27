@@ -8,11 +8,13 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.1" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.1" />
       <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.1" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\WindowManager\WindowManager.csproj" />
+      <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj" />
+      <ProjectReference Include="..\Infrastructure.Abstractions\Infrastructure.Abstractions.csproj" />
     </ItemGroup>
 
 </Project>

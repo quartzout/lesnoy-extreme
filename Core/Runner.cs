@@ -1,26 +1,28 @@
 using System.Diagnostics;
 using System.Security.Principal;
+using Core.Abstractions;
+using Core.Abstractions.Models;
+using Core.Options;
+using Infrastructure.Abstractions;
 using Microsoft.Extensions.Options;
-using Steps.Options;
-using WindowManager;
 
-namespace Steps;
+namespace Core;
 
-public class MarcoStep(
+public class Runner(
     IWindowManager windowManager,
-    IOptions<StepsOptions> optionsAccessor)
+    IOptions<StepsOptions> optionsAccessor) : IRunner
 {
     
     private readonly StepsOptions _stepsOptions = optionsAccessor.Value;
     
-    public async Task Run(CancellationToken token)
+    public async Task<RunnerResult> RunToCompletion(CancellationToken token)
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
         Console.WriteLine("привет!!!");
 
         try
         {
-            if (_stepsOptions.DoOsSpecificChecks && !CheckAdmin()) return;
+            if (_stepsOptions.DoAdminCheck && !CheckAdmin()) return RunnerResult.Error.AdminRightsRequired;
 
             SetupWindow();
             await StartTest();
@@ -33,6 +35,8 @@ public class MarcoStep(
             Console.WriteLine("\n\nвы ошибка, нажмите чтобы выйти");
             Console.ReadLine();
         }
+        
+        return new RunnerResult.Success();
     }
     
     bool CheckAdmin()

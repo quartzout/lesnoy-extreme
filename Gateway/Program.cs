@@ -1,16 +1,15 @@
+using Core;
+using Core.Options;
 using Gateway;
 using Gateway.Extensions;
-using Microsoft.Extensions.Configuration;
+using Infrastructure.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Steps;
-using Steps.Options;
-using WindowManager;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-builder.Services.AddSteps();
-builder.Services.AddWindowManager();
+builder.Services.AddCore();
+builder.Services.AddInfrastructureWindows();
 builder.Services.AddGateway();
 
 builder.AddProcessNameConfigurationSource();

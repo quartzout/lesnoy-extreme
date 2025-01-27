@@ -1,4 +1,4 @@
-namespace Steps.Options;
+namespace Core.Options;
 
 public readonly struct Vector
 {

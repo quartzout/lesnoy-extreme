@@ -21,8 +21,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Steps\Steps.csproj" />
-      <ProjectReference Include="..\WindowManager\WindowManager.csproj" />
+      <ProjectReference Include="..\Core\Core.csproj" />
+      <ProjectReference Include="..\Infrastructure.Windows\Infrastructure.Windows.csproj" />
     </ItemGroup>
 
     <ItemGroup>

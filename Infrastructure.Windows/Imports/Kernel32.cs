@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace WindowManager.Imports;
+namespace Infrastructure.Windows.Imports;
 
 internal static class Kernel32
 {

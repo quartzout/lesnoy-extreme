@@ -1,10 +1,10 @@
-namespace Steps.Options;
+namespace Core.Options;
 
 public record StepsOptions
 {
     public static string SectionName = nameof(StepsOptions);
     
-    public required bool DoOsSpecificChecks { get; init; }
+    public required bool DoAdminCheck { get; init; }
     public required TimeSpan TestDuration { get; init; }
     public required TimeSpan ShutdownDelay { get; init; }
     public required TimeSpan TimerInterval { get; init; } 
