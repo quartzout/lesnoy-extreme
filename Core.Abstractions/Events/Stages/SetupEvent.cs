@@ -2,5 +2,7 @@ namespace Core.Abstractions.Events.Stages;
 
 public static class SetupEvent
 {
-    public class Started;
+    public record Started;
+
+    public record Finished;
 }
