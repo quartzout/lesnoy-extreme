@@ -171,7 +171,8 @@ async Task SetupWindow(Settings settings)
             settings.ConsoleWindowSize.Y);
 
         IntPtr confirmWindow;
-        var attempts = 0;
+        var confirmAttempts = TimeSpan.Zero;
+        var confirmWindowSearchDelay = TimeSpan.FromMilliseconds(100);
         do
         {
             confirmWindow = Window.Find("Open File - Security Warning");
@@ -180,9 +181,9 @@ async Task SetupWindow(Settings settings)
                 continue;
             }
 
-            await Task.Delay(TimeSpan.FromMilliseconds(100));
-            attempts++;
-        } while (confirmWindow == IntPtr.Zero && attempts < 5);
+            await Task.Delay(confirmWindowSearchDelay);
+            confirmAttempts+= confirmWindowSearchDelay;
+        } while (confirmWindow == IntPtr.Zero && confirmAttempts < TimeSpan.FromSeconds(5));
         
 
         if (confirmWindow != IntPtr.Zero)
@@ -296,6 +297,46 @@ async Task SetupWindow(Settings settings)
             continue;
         }
         
+        Console.WriteLine("Нажимаю галочки...");
+    
+        await PressButton(55, 110, 1);
+        await PressButton(55, 125, 1);
+
+        IntPtr warningWindow;
+        var warningWindowSearchAttemptDelay = TimeSpan.FromMilliseconds(200);
+        var warningAttempts = TimeSpan.Zero;
+        do
+        {
+            warningWindow = Window.Find("Warning");
+            if (warningWindow != IntPtr.Zero)
+            {
+                continue;
+            }
+
+            await Task.Delay(warningWindowSearchAttemptDelay);
+            warningAttempts+= warningWindowSearchAttemptDelay;
+        } while (warningWindow == IntPtr.Zero && warningAttempts < TimeSpan.FromSeconds(5));
+
+        if (warningWindow != IntPtr.Zero)
+        {
+            var warningSizeResult = 
+                Window.SetWindowPos(warningWindow, 0, 0, settings.WindowSize.X, settings.WindowSize.Y);
+            
+            if (warningSizeResult is false)
+            {
+                Console.WriteLine("Не удалось переместить окно подтверждения галочки Stress GPU");
+            }
+            
+            await Task.Delay(TimeSpan.FromMilliseconds(100));
+            await PressButton(300, 225, 3);
+
+            await Task.Delay(TimeSpan.FromSeconds(1));
+        }
+        else
+        {
+            Console.WriteLine("Не найдено окно с подтверждением галочки Stress GPU. Продолжаем так");
+        }
+        
         setupResult = true;
 
     } while (!setupResult);
@@ -366,12 +407,6 @@ async Task RunTimer(Settings settings)
 async Task StartTest(Settings settings)
 {
     Console.Clear();
-    Console.WriteLine("Нажимаю галочки...");
-    
-    await PressButton(55, 110, 1);
-    await PressButton(55, 125, 1);
-
-    await Task.Delay(TimeSpan.FromDays(1));
     
     Console.WriteLine("нажимаю на старт...");
 
