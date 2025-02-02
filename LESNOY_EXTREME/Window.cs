@@ -398,9 +398,10 @@ public static class Window
         return (point.X, point.Y);
     }
 
-    public static bool SetWindowPos(IntPtr hWnd, int x, int y, int cx, int cy)
+    public static bool SetWindowPos(IntPtr hWnd, int x, int y, int cx, int cy, bool topmost = false)
     {
-        return User32.SetWindowPos(hWnd, HWND_TOPMOST, x, y, cx, cy, SWP.NOOWNERZORDER);
+        return User32.SetWindowPos(hWnd, topmost ? HWND_TOPMOST : new IntPtr(0),
+            x, y, cx, cy, SWP.NOOWNERZORDER);
     }
 
     /// <summary>

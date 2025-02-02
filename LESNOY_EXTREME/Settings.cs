@@ -5,6 +5,11 @@ public record Settings
     public TimeSpan TestDuration { get; init; } = TimeSpan.FromMinutes(40);
     public TimeSpan ShutdownDelay { get; init; } = TimeSpan.FromMinutes(3);
     public TimeSpan TimerInterval { get; init; } = TimeSpan.FromSeconds(0.1);
+    public string[] PossibleFilenames { get; init; } =
+    [
+        "aida64.exe",
+        "aida64.exe - Shortcut.lnk"
+    ];
     public string WindowName { get; init; } = "System Stability Test - AIDA64";
     public (int X, int Y) WindowSize { get; init; } = (800, 600);
     public (int X, int Y) ConsoleWindowSize { get; init; } = (600, 400);

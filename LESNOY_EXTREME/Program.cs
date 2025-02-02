@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Principal;
 using System.Text.RegularExpressions;
 using System.Timers;
@@ -80,7 +81,7 @@ async Task RunShutdownTimer(Settings settings)
     }
 }
 
-void SetupWindow(Settings settings)
+async Task SetupWindow(Settings settings)
 {
     var setupResult = false;
     var firstAttempt = true;
@@ -88,7 +89,8 @@ void SetupWindow(Settings settings)
     {
         if (!firstAttempt)
         {
-            Console.WriteLine("перезапустите аиду и\\или скрипт");
+            Console.WriteLine();
+            Console.WriteLine("перезапустите скрипт");
             Console.WriteLine("нажмите Enter чтобы повторить попытку");
             Console.ReadLine();
             Console.Clear();
@@ -97,15 +99,172 @@ void SetupWindow(Settings settings)
         firstAttempt = false;
         setupResult = false;
         
-        Console.WriteLine($"пытаюсь найти окно \"{settings.WindowName}\" ");
-        var window = Window.Find(settings.WindowName);
-        if (window == IntPtr.Zero)
+        var exeName = settings.PossibleFilenames.FirstOrDefault(filename => 
+            File.Exists(Path.Combine(Environment.CurrentDirectory, filename)));
+        if (exeName is null)
         {
-            Console.WriteLine("не могу найти нужное окно!!!");
+            Console.WriteLine("Не могу найти exe аиды в директории со скриптом. " +
+                              "Exe должен называться одиим из следующих имен: " +
+                              $"{string.Join(',', settings.PossibleFilenames)}");
+            continue;
+        }
+
+        Console.ReadLine();
+
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = "cmd.exe", 
+            Arguments = $"/c \"{exeName}\"",
+            RedirectStandardError = true,
+        };
+
+        Process? process;
+        try
+        {
+            process = Process.Start(startInfo);
+            if (process is null)
+            {
+                Console.WriteLine("Процесс аиды не смог запуститься");
+                continue;
+            }
+
+            // ахахахахахахаххахахахахаххахахахахах
+            await Task.Delay(TimeSpan.FromMilliseconds(200));
+            
+            if (process.HasExited)
+            {
+                var stdErr = process.StandardError.ReadToEnd();
+                Console.WriteLine("Процесс аиды завершился: " + stdErr);
+                continue;
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Process.Start выкинул исключение: {e.Message}");
+            continue;
+        }
+        
+        var current = Window.GetCurrentWindow();
+        if (current == IntPtr.Zero)
+        {
+            Console.WriteLine("не могу найти окно консоли скрипта!!!");
+            continue;
+        }
+        
+        var currentTopmostResult = Window.MakeTopmost(current);
+        if (!currentTopmostResult)
+        {
+            Console.WriteLine("не могу сделать скрипта окно на поверх остальных окон по неизвестной ошибке!");
+            continue;
+        }
+        
+        var quickResult = Window.DisableQuickEdit();
+        if (!quickResult)
+        {
+            Console.WriteLine("не могу выключить редактирование в окно скрипта по неизвестной ошибке!");
+            continue;
+        }
+        
+        var focusResult = Window.Focus(current);
+        var topResult = Window.BringWindowToTop(current);
+        var placeResult = Window.SetWindowPos(current, settings.WindowSize.X, 0, settings.ConsoleWindowSize.X,
+            settings.ConsoleWindowSize.Y);
+
+        IntPtr confirmWindow;
+        var attempts = 0;
+        do
+        {
+            confirmWindow = Window.Find("Open File - Security Warning");
+            if (confirmWindow != IntPtr.Zero)
+            {
+                continue;
+            }
+
+            await Task.Delay(TimeSpan.FromMilliseconds(100));
+            attempts++;
+        } while (confirmWindow == IntPtr.Zero && attempts < 5);
+        
+
+        if (confirmWindow != IntPtr.Zero)
+        {
+            var confirmSizeResult = 
+                Window.SetWindowPos(confirmWindow, 0, 0, settings.WindowSize.X, settings.WindowSize.Y);
+            
+            if (confirmSizeResult is false)
+            {
+                Console.WriteLine("Не удалось переместить окно подтверждения открытия аиды");
+                continue;
+            }
+            
+            await Task.Delay(TimeSpan.FromMilliseconds(500));
+            await PressButton(280, 220, 4);
+        }
+        else
+        {
+            Console.WriteLine("Не найдено окно с подтверждением открытия аиды. Продолжаем так");
+        }
+
+        IntPtr mainWindow;
+        var aidaSearchAttemptDelay = TimeSpan.FromMilliseconds(200);
+        var aidaAttempts = TimeSpan.Zero;
+        do
+        {
+            mainWindow = Window.Find("AIDA64 Extreme v7.50.7200");
+            if (mainWindow != IntPtr.Zero)
+                continue;
+            
+            aidaAttempts += aidaSearchAttemptDelay;
+            await Task.Delay(aidaSearchAttemptDelay);
+        } while (mainWindow == IntPtr.Zero && aidaSearchAttemptDelay < TimeSpan.FromMinutes(1));
+
+        await Task.Delay(TimeSpan.FromSeconds(5));
+        
+        if (mainWindow == IntPtr.Zero)
+        {
+            Console.WriteLine("не могу найти окно аиды!!!");
             continue;
         }
         
         Console.WriteLine("аида найдена спасибо!");
+        
+        var mainWindowPosResult = 
+            Window.SetWindowPos(mainWindow, 0, 0, settings.WindowSize.X, settings.WindowSize.Y);
+            
+        if (mainWindowPosResult is false)
+        {
+            Console.WriteLine("Не удалось переместить начальное окно аиды");
+            continue;
+        }
+        
+        var mainFocusResult = Window.Focus(mainWindow);
+        if (mainFocusResult is false)
+        {
+            Console.WriteLine("Ошибка фокуса начального окна аиды");
+            continue;
+        }
+        
+        await Task.Delay(TimeSpan.FromMilliseconds(200));
+        
+        await PressButton(195, 50, 2);
+        
+        IntPtr window;
+        var aidaWindowSearchAttemptDelay = TimeSpan.FromMilliseconds(200);
+        var aidaWindowAttempts = TimeSpan.Zero;
+        do
+        {
+            window = Window.Find(settings.WindowName);
+            if (window != IntPtr.Zero)
+                continue;
+            
+            aidaWindowAttempts += aidaWindowSearchAttemptDelay;
+            await Task.Delay(aidaWindowSearchAttemptDelay);
+        } while (window == IntPtr.Zero && aidaWindowAttempts < TimeSpan.FromMinutes(1));
+
+        if (window == IntPtr.Zero)
+        {
+            Console.WriteLine("Не могу найти окно стресс теста аиды");
+            continue;
+        }
         
         Window.RemoveBorders(window);
         
@@ -137,32 +296,6 @@ void SetupWindow(Settings settings)
             continue;
         }
         
-        var current = Window.GetCurrentWindow();
-        if (current == IntPtr.Zero)
-        {
-            Console.WriteLine("не могу найти окно консоли скрипта!!!");
-            continue;
-        }
-        
-        var currentTopmostResult = Window.MakeTopmost(current);
-        if (!currentTopmostResult)
-        {
-            Console.WriteLine("не могу сделать скрипта окно на поверх остальных окон по неизвестной ошибке!");
-            continue;
-        }
-        
-        var quickResult = Window.DisableQuickEdit();
-        if (!quickResult)
-        {
-            Console.WriteLine("не могу выключить редактирование в окно скрипта по неизвестной ошибке!");
-            continue;
-        }
-        
-        var focusResult = Window.Focus(current);
-        var topResult = Window.BringWindowToTop(current);
-        var placeResult = Window.SetWindowPos(current, settings.WindowSize.X, 0, settings.ConsoleWindowSize.X,
-            settings.ConsoleWindowSize.Y);
-
         setupResult = true;
 
     } while (!setupResult);
@@ -233,6 +366,13 @@ async Task RunTimer(Settings settings)
 async Task StartTest(Settings settings)
 {
     Console.Clear();
+    Console.WriteLine("Нажимаю галочки...");
+    
+    await PressButton(55, 110, 1);
+    await PressButton(55, 125, 1);
+
+    await Task.Delay(TimeSpan.FromDays(1));
+    
     Console.WriteLine("нажимаю на старт...");
 
     await PressButton(settings.StartClickOffset.X, settings.WindowSize.Y + settings.StartClickOffset.Y, settings.ClickCount);
@@ -267,7 +407,7 @@ try
 {
     if (!CheckAdmin()) return;
     var settings = ReadSettings();
-    SetupWindow(settings);
+    await SetupWindow(settings);
     await StartTest(settings);
     await RunTimer(settings);
     await StopTest(settings);
