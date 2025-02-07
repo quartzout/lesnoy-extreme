@@ -23,11 +23,11 @@ public static class Setup
             firstAttempt = false;
             setupResult = false;
 
-            Console.Write("Настраиваю окно консоли...   ");
-            var setupConsoleResult = await SetupConsole(settings);
-            if (!setupConsoleResult)
+            Console.Write("Перемещаю окно консоли...   ");
+            var moveConsoleResult = await MoveConsole();
+            if (!moveConsoleResult)
                 continue;
-            Console.WriteLine("Настроено");
+            Console.WriteLine("Перемещено");
 
             Console.Write("Запускаю аиду...   ");
             var launchAppResult = await LaunchApp();
@@ -68,6 +68,12 @@ public static class Setup
             if (!warningResult)
                 continue;
             
+            Console.Write("Блокирую окно консоли...   ");
+            var lockConsoleResult = await LockConsole(settings);
+            if (!lockConsoleResult)
+                continue;
+            Console.WriteLine("Заблокировано");
+            
             Console.WriteLine("Этап подготовки успешно завершен!");
             await Task.Delay(TimeSpan.FromSeconds(1));
             
@@ -90,9 +96,15 @@ public static class Setup
                 Console.WriteLine("Не удалось переместить окно подтверждения галочки Stress GPU");
                 return false;
             }
-                
-            await Task.Delay(TimeSpan.FromMilliseconds(100));
-            await Button.PressButton(300, 225, 3);
+            
+            await Task.Delay(TimeSpan.FromSeconds(0.5));
+            await Button.PressButton(300, 225, 1);
+            
+            await Task.Delay(TimeSpan.FromSeconds(0.5));
+            await Button.PressButton(300, 215, 1);
+            
+            await Task.Delay(TimeSpan.FromSeconds(0.5));
+            await Button.PressButton(300, 205, 1);
 
             Console.WriteLine("Закрыто");
             return true;
@@ -104,7 +116,7 @@ public static class Setup
 
     private static async Task<bool> MainWindow()
     {
-        var mainWindow = await FindWindow("AIDA64 Extreme v7.50.7200", TimeSpan.FromMinutes(1));
+        var mainWindow = await FindWindow("AIDA64 Extreme v7.20.6802", TimeSpan.FromMinutes(1));
 
         await Task.Delay(TimeSpan.FromSeconds(5));
             
@@ -176,7 +188,21 @@ public static class Setup
         return true;
     }
 
-    private static async Task<bool> SetupConsole(Settings settings)
+    private static async Task<bool> MoveConsole()
+    {
+        var current = Window.GetCurrentWindow();
+        if (current == IntPtr.Zero)
+        {
+            Console.WriteLine("Не могу найти окно консоли!");
+            return false;
+        }
+        
+        Window.SetWindowPos(current,800, 0, 800, 500);
+
+        return true;
+    }
+    
+    private static async Task<bool> LockConsole(Settings setting)
     {
         var current = Window.GetCurrentWindow();
         if (current == IntPtr.Zero)
@@ -201,7 +227,7 @@ public static class Setup
             
         var focusResult = Window.Focus(current);
         var topResult = Window.BringWindowToTop(current);
-        var placeResult = Window.SetWindowPos(current,800, 0, 600, 400);
+        var placeResult = Window.SetWindowPos(current,800, 0, 800, 500);
         
         return true;
     }
